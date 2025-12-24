@@ -1,28 +1,29 @@
-# Start from the official n8n image (Alpine Linux based)
+# Start from the official n8n image (It is currently Debian/Ubuntu-based, not Alpine)
 FROM n8nio/n8n:latest
 
 # Switch to root to install system packages
 USER root
 
 # ----------------------------------------------------------------
-# 1. SYSTEM PACKAGES (APK)
+# 1. SYSTEM PACKAGES (APT)
 # ----------------------------------------------------------------
-RUN apk add --no-cache \
+# Update package lists and install packages using apt
+RUN apt update && apt install -y --no-install-recommends \
     # --- Basics & Build Tools ---
     bash \
     curl \
     git \
     zip \
     unzip \
-    build-base \
+    build-essential \
     libffi-dev \
-    openssl-dev \
+    libssl-dev \
     # --- Python Environment ---
     python3 \
-    py3-pip \
+    python3-pip \
     # --- Browser Engine (Selenium/Puppeteer) ---
     chromium \
-    chromium-chromedriver \
+    chromium-driver \
     # --- Media Processing ---
     ffmpeg \
     # --- OSINT & Metadata Tools ---
@@ -32,8 +33,11 @@ RUN apk add --no-cache \
     imagemagick \
     tesseract-ocr \
     # --- Data Science Acceleration (Faster than pip) ---
-    py3-numpy \
-    py3-pandas
+    python3-numpy \
+    python3-pandas \
+    # Clean up APT lists to keep the image small
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # ----------------------------------------------------------------
 # 2. NODE.JS CONFIGURATION
@@ -47,7 +51,8 @@ RUN npm install puppeteer
 # ----------------------------------------------------------------
 # 3. PYTHON LIBRARIES (PIP)
 # ----------------------------------------------------------------
-# We use --break-system-packages to bypass Alpine's safety check
+# The --break-system-packages flag is for Debian/Ubuntu (not needed on Alpine)
+# but it's safe to use to avoid potential conflicts with system Python.
 RUN pip3 install --break-system-packages \
     # --- Browser Automation & Scraping ---
     selenium \
