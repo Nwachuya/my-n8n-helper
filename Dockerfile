@@ -5,9 +5,19 @@ FROM n8nio/n8n:latest
 USER root
 
 # ----------------------------------------------------------------
+# 0. RESTORE APK PACKAGE MANAGER
+# ----------------------------------------------------------------
+# The n8n base image removes apk-tools for security/size.
+# We must restore it before installing any packages.
+RUN wget -q https://dl-cdn.alpinelinux.org/alpine/v3.22/main/x86_64/apk-tools-static-2.14.6-r3.apk -O /tmp/apk-tools-static.apk && \
+    tar -xzf /tmp/apk-tools-static.apk -C /tmp && \
+    /tmp/sbin/apk.static add --no-cache apk-tools && \
+    rm -rf /tmp/apk-tools-static.apk /tmp/sbin
+
+# ----------------------------------------------------------------
 # 1. SYSTEM PACKAGES (APK)
 # ----------------------------------------------------------------
-RUN apk add --no-cache \
+RUN apk update && apk add --no-cache \
     # --- Basics & Build Tools ---
     bash \
     curl \
@@ -26,7 +36,7 @@ RUN apk add --no-cache \
     # --- Media Processing ---
     ffmpeg \
     # --- OSINT & Metadata Tools ---
-    exiftool \
+    perl-image-exiftool \
     whois \
     # --- OCR & Image Processing ---
     imagemagick \
