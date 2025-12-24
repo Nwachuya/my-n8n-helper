@@ -8,11 +8,11 @@ USER root
 # 0. RESTORE APK PACKAGE MANAGER
 # ----------------------------------------------------------------
 # The n8n base image removes apk-tools for security/size.
-# We must restore it before installing any packages.
-RUN wget -q https://dl-cdn.alpinelinux.org/alpine/v3.22/main/x86_64/apk-tools-static-2.14.6-r3.apk -O /tmp/apk-tools-static.apk && \
-    tar -xzf /tmp/apk-tools-static.apk -C /tmp && \
-    /tmp/sbin/apk.static add --no-cache apk-tools && \
-    rm -rf /tmp/apk-tools-static.apk /tmp/sbin
+# We must restore it using the static apk binary from Alpine's GitLab.
+RUN wget -q https://gitlab.alpinelinux.org/api/v4/projects/5/packages/generic//v2.14.4/x86_64/apk.static -O /tmp/apk.static && \
+    chmod +x /tmp/apk.static && \
+    /tmp/apk.static -X https://dl-cdn.alpinelinux.org/alpine/v3.20/main -U --allow-untrusted --initdb add apk-tools && \
+    rm /tmp/apk.static
 
 # ----------------------------------------------------------------
 # 1. SYSTEM PACKAGES (APK)
