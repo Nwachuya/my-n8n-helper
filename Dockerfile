@@ -1,29 +1,28 @@
-# Start from the official n8n image (It is currently Debian/Ubuntu-based, not Alpine)
+# Start from the official n8n image (Alpine Linux based)
 FROM n8nio/n8n:latest
 
 # Switch to root to install system packages
 USER root
 
 # ----------------------------------------------------------------
-# 1. SYSTEM PACKAGES (APT)
+# 1. SYSTEM PACKAGES (APK)
 # ----------------------------------------------------------------
-# Update package lists and install packages using apt
-RUN apt update && apt install -y --no-install-recommends \
+RUN apk add --no-cache \
     # --- Basics & Build Tools ---
     bash \
     curl \
     git \
     zip \
     unzip \
-    build-essential \
+    build-base \
     libffi-dev \
-    libssl-dev \
+    openssl-dev \
     # --- Python Environment ---
     python3 \
-    python3-pip \
+    py3-pip \
     # --- Browser Engine (Selenium/Puppeteer) ---
     chromium \
-    chromium-driver \
+    chromium-chromedriver \
     # --- Media Processing ---
     ffmpeg \
     # --- OSINT & Metadata Tools ---
@@ -33,11 +32,8 @@ RUN apt update && apt install -y --no-install-recommends \
     imagemagick \
     tesseract-ocr \
     # --- Data Science Acceleration (Faster than pip) ---
-    python3-numpy \
-    python3-pandas \
-    # Clean up APT lists to keep the image small
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    py3-numpy \
+    py3-pandas
 
 # ----------------------------------------------------------------
 # 2. NODE.JS CONFIGURATION
@@ -51,8 +47,7 @@ RUN npm install puppeteer
 # ----------------------------------------------------------------
 # 3. PYTHON LIBRARIES (PIP)
 # ----------------------------------------------------------------
-# The --break-system-packages flag is for Debian/Ubuntu (not needed on Alpine)
-# but it's safe to use to avoid potential conflicts with system Python.
+# We use --break-system-packages to bypass Alpine's safety check
 RUN pip3 install --break-system-packages \
     # --- Browser Automation & Scraping ---
     selenium \
