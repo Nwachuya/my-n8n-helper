@@ -4,10 +4,15 @@ FROM n8nio/n8n:latest
 
 USER root
 
+# Copy apk binary and all its dependencies from Alpine
 COPY --from=alpine /sbin/apk /sbin/apk
 COPY --from=alpine /etc/apk /etc/apk
 COPY --from=alpine /lib/apk /lib/apk
 COPY --from=alpine /usr/share/apk /usr/share/apk
+COPY --from=alpine /lib/libapk.so.3.0.0 /lib/
+COPY --from=alpine /lib/libcrypto.so.3 /lib/
+COPY --from=alpine /lib/libssl.so.3 /lib/
+COPY --from=alpine /lib/libz.so.1 /lib/
 
 RUN apk update && apk add --no-cache \
     bash curl git zip unzip \
