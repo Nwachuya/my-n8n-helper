@@ -1,4 +1,12 @@
+FROM alpine:latest AS alpine
+
 FROM n8nio/n8n:latest
+
+COPY --from=alpine /sbin/apk /sbin/apk
+COPY --from=alpine /lib/libapk.so.3 /lib/
+COPY --from=alpine /lib/libcrypto.so.3 /lib/
+COPY --from=alpine /lib/libssl.so.3 /lib/
+COPY --from=alpine /lib/libz.so.1 /lib/
 
 USER root
 
