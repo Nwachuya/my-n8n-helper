@@ -28,15 +28,12 @@ RUN apk update && apk add --no-cache \
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
-    CHROME_BIN=/usr/bin/chromium-browser \
-    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 \
-    PLAYWRIGHT_BROWSERS_PATH=/usr/bin
+    CHROME_BIN=/usr/bin/chromium-browser
 
 RUN npm install --global puppeteer
 
 RUN pip3 install --break-system-packages --no-cache-dir --upgrade pip setuptools wheel && \
     pip3 install --break-system-packages --no-cache-dir \
-    playwright \
     beautifulsoup4 lxml requests httpx fake-useragent \
     trafilatura \
     instaloader gallery-dl yt-dlp \
@@ -46,6 +43,7 @@ RUN pip3 install --break-system-packages --no-cache-dir --upgrade pip setuptools
     pandas openpyxl xlsxwriter pdfplumber pypdf \
     textblob langdetect \
     python-dotenv validators \
+    selenium \
     && rm -rf /root/.cache/pip /tmp/*
 
 USER node
