@@ -17,12 +17,13 @@ COPY --from=alpine /usr/lib/libz.so.1 /usr/lib/
 RUN apk update && apk add --no-cache \
     bash curl git zip unzip \
     build-base libffi-dev openssl-dev \
-    python3 py3-pip \
+    python3 py3-pip python3-dev \
     chromium chromium-chromedriver \
     ffmpeg \
     perl-image-exiftool whois \
     imagemagick tesseract-ocr \
     py3-numpy py3-pandas \
+    gcc musl-dev linux-headers \
     && rm -rf /var/cache/apk/*
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
@@ -33,7 +34,8 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 RUN npm install --global puppeteer
 
-RUN pip3 install --break-system-packages --no-cache-dir \
+RUN pip3 install --break-system-packages --no-cache-dir --upgrade pip setuptools wheel && \
+    pip3 install --break-system-packages --no-cache-dir \
     playwright \
     beautifulsoup4 lxml requests httpx fake-useragent \
     trafilatura \
