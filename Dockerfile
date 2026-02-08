@@ -31,6 +31,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     CHROME_BIN=/usr/bin/chromium-browser
 
 RUN npm install --global puppeteer
+RUN apk add --no-cache nodejs-current
 
 RUN pip3 install --break-system-packages --no-cache-dir --upgrade pip setuptools wheel && \
     pip3 install --break-system-packages --no-cache-dir \
