@@ -29,55 +29,49 @@ RUN apk update && apk add --no-cache \
     perl-image-exiftool whois \
     # Image processing
     imagemagick tesseract-ocr \
-    # Browser automation
-    chromium chromium-chromedriver \
-    # Node.js (latest - required for yt-dlp JavaScript runtime)
-    nodejs-current npm \
+    # Browser automation (needed by Playwright/Crawl4AI)
+    chromium \
     && rm -rf /var/cache/apk/*
 
 # ============================================
-# Step 3: Configure Browser Environment
+# Step 3: Install n8n Community Nodes
 # ============================================
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
-    CHROME_BIN=/usr/bin/chromium-browser
+RUN cd /usr/local/lib/node_modules/n8n && \
+    npm install n8n-nodes-nca-toolkit-v2
 
 # ============================================
-# Step 4: Install Node.js Packages
-# ============================================
-RUN npm install --global puppeteer
-
-# ============================================
-# Step 5: Install Python Packages (Always Latest)
-# Using --upgrade flag ensures latest versions
+# Step 4: Install Python Packages
 # ============================================
 RUN pip3 install --break-system-packages --no-cache-dir --upgrade pip setuptools wheel && \
     pip3 install --break-system-packages --no-cache-dir --upgrade \
     # Web scraping & parsing
-    beautifulsoup4 lxml requests httpx fake-useragent trafilatura \
-    # Media downloaders (always fetch latest)
-    yt-dlp gallery-dl instaloader \
+    beautifulsoup4 lxml requests httpx trafilatura \
     # SEO & marketing
     advertools \
     # OSINT & research
-    holehe phonenumbers \
+    phonenumbers maigret holehe \
     # Data processing
     pandas openpyxl xlsxwriter \
-    # PDF processing  
+    # PDF processing
     pdfplumber pypdf \
     # Text processing
     textblob langdetect \
     # Utilities
     python-dotenv validators \
-    # Browser automation
-    selenium \
+    # Web crawling
+    crawl4ai \
     && rm -rf /root/.cache/pip /tmp/*
 
 # ============================================
-# Step 6: Create cookies directory for yt-dlp
+# Step 5: Setup Crawl4AI (install Playwright browsers)
 # ============================================
-RUN mkdir -p /home/node/.cookies && \
-    chown -R node:node /home/node/.cookies
+RUN playwright install --with-deps chromium
+
+# ============================================
+# Step 6: Create directories for shared files
+# ============================================
+RUN mkdir -p /data/shared-files && \
+    chown -R node:node /data/shared-files
 
 # ============================================
 # Step 7: Health Check
@@ -89,9 +83,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 # Metadata
 # ============================================
 LABEL maintainer="n8n-automation" \
-      description="n8n with web scraping, media downloads, browser automation & OSINT tools" \
-      version="2.0-streamlined" \
-      nodejs.version="current" \
-      yt-dlp.version="latest"
+      description="n8n with web scraping, media processing, OCR, Crawl4AI & NCA Toolkit" \
+      version="3.0-clean"
 
 USER node
