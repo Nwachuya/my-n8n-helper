@@ -36,8 +36,11 @@ RUN apk update && apk add --no-cache \
 # ============================================
 # Step 3: Install n8n Community Nodes
 # ============================================
-RUN cd /usr/local/lib/node_modules/n8n && \
-    npm install n8n-nodes-nca-toolkit-v2
+RUN mkdir -p /home/node/.n8n/nodes && \
+    cd /home/node/.n8n/nodes && \
+    npm init -y && \
+    npm install n8n-nodes-nca-toolkit-v2 && \
+    chown -R node:node /home/node/.n8n
 
 # ============================================
 # Step 4: Install Python Packages
