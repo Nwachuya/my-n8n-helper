@@ -19,17 +19,11 @@ COPY --from=alpine /usr/lib/libz.so.1 /usr/lib/
 # Step 2: Install System Packages
 # ============================================
 RUN apk update && apk add --no-cache \
-    # Core build tools
     build-base libffi-dev openssl-dev \
-    # Python runtime
     python3 py3-pip python3-dev \
-    # Media processing
     ffmpeg \
-    # Metadata & utilities
     perl-image-exiftool whois \
-    # Image processing
     imagemagick tesseract-ocr \
-    # Browser automation (needed by Playwright/Crawl4AI)
     chromium \
     && rm -rf /var/cache/apk/*
 
@@ -47,46 +41,29 @@ RUN mkdir -p /home/node/.n8n/nodes && \
 # ============================================
 RUN pip3 install --break-system-packages --no-cache-dir --upgrade pip setuptools wheel && \
     pip3 install --break-system-packages --no-cache-dir --upgrade \
-    # Web scraping & parsing
     beautifulsoup4 lxml requests httpx trafilatura \
-    # SEO & marketing
     advertools \
-    # OSINT & research
     phonenumbers maigret holehe \
-    # Data processing
     pandas openpyxl xlsxwriter \
-    # PDF processing
     pdfplumber pypdf \
-    # Text processing
     textblob langdetect \
-    # Utilities
     python-dotenv validators \
-    # Web crawling
-    crawl4ai \
     && rm -rf /root/.cache/pip /tmp/*
 
 # ============================================
-# Step 5: Setup Crawl4AI (install Playwright browsers)
-# ============================================
-RUN playwright install --with-deps chromium
-
-# ============================================
-# Step 6: Create directories for shared files
+# Step 5: Create shared files directory
 # ============================================
 RUN mkdir -p /data/shared-files && \
     chown -R node:node /data/shared-files
 
 # ============================================
-# Step 7: Health Check
+# Step 6: Health Check
 # ============================================
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:5678/healthz || exit 1
 
-# ============================================
-# Metadata
-# ============================================
 LABEL maintainer="n8n-automation" \
-      description="n8n with web scraping, media processing, OCR, Crawl4AI & NCA Toolkit" \
-      version="3.0-clean"
+      description="n8n with media processing, OCR, OSINT & NCA Toolkit" \
+      version="3.0"
 
 USER node
